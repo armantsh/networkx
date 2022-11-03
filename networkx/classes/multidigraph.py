@@ -13,6 +13,7 @@ from networkx.classes.reportviews import (
     InMultiEdgeView,
     OutMultiDegreeView,
     OutMultiEdgeView,
+    OutMultiEdgeBunchView
 )
 from networkx.exception import NetworkXError
 
@@ -562,6 +563,12 @@ class MultiDiGraph(MultiGraph, DiGraph):
             # remove the key entries if last edge
             del self._succ[u][v]
             del self._pred[v][u]
+
+    @property
+    def edge_bunches(self):
+        self.__dict__['edge_bunches'] = edge_bunches = OutMultiEdgeBunchView(self)
+        self.__dict__['out_edge_bunches'] = edge_bunches
+        return edge_bunches
 
     @cached_property
     def edges(self):

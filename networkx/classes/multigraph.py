@@ -7,7 +7,7 @@ import networkx.convert as convert
 from networkx import NetworkXError
 from networkx.classes.coreviews import MultiAdjacencyView
 from networkx.classes.graph import Graph
-from networkx.classes.reportviews import MultiDegreeView, MultiEdgeView
+from networkx.classes.reportviews import MultiDegreeView, MultiEdgeView, MultiEdgeBunchView
 
 __all__ = ["MultiGraph"]
 
@@ -776,6 +776,40 @@ class MultiGraph(Graph):
                 return key in self._adj[u][v]
         except KeyError:
             return False
+
+    @property
+    def edge_bunches(self):
+        """
+        Returns an iterator over the edge bunches.
+        edge_bunches(self)
+        Edge bunches are returned as tuples with data in the order (node,
+        neighbor, data) where data is an array of dicts of the attributes
+        of each edge.
+        Returns
+        -------
+        edge_bunches : MultiEdgeBunchView
+            A view of edge bunch attributes, usually it iterates over
+            (u, v, d) tuples of edge bunches.
+        Examples
+        --------
+        >>> G = nx.MultiGraph()   # or MultiDiGraph
+        >>> nx.add_path(G, [0, 1, 2])
+        >>> nx.add_path(G, [0, 1, 2])
+        >>> [eb for eb in G.edge_bunches()]
+        [(0, 1, [{}, {}]), (1, 2, [{}, {}])]
+        >>> G = nx.MultiGraph()   # or MultiDiGraph
+        >>> G.add_edge(0, 1, weight=1)
+        >>> G.add_edge(0, 1, weight=2)
+        >>> G.add_edge(1, 2, weight=2)
+        >>> G.add_edge(0, 2, weight=4)
+        >>> [eb for eb in G.edge_bunches()]
+        [(0, 1, [{'weight': 1}, {'weight': 2}]), (0, 2, [{'weight': 4}]), (1, 2, [{'weight': 2}])]
+        Edge bunches are returned as tuples with data in the order (node, neighbor, data)
+        # TODO: enable data=False to be used as an argument. Currently outputs data as default.
+        # TODO: enable output of keys
+        """
+        self.__dict__['edge_bunches'] = edge_bunches = MultiEdgeBunchView(self)
+        return edge_bunches
 
     @cached_property
     def edges(self):
